@@ -1,0 +1,263 @@
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                              VISITOR PATTERN                                        │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+                         ┌─────────────────────┐
+                         │   <<interface>>     │
+                         │  ArtifactVisitor    │
+                         ├─────────────────────┤
+                         │ +visit(Weapon)      │
+                         │ +visit(Potion)      │
+                         │ +visit(Scroll)      │
+                         │ +visit(Ring)        │
+                         │ +visit(Armor)       │
+                         └──────────┬──────────┘
+                                    │
+            ┌───────────┬───────────┼───────────┬───────────┐
+            │           │           │           │           │
+            ▼           ▼           ▼           ▼           ▼
+┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+│ValueCalculator  │ │WeightCalculator │ │DetailedReport   │ │EnchantmentPower │ │   Rarity        │
+│    Visitor      │ │    Visitor      │ │    Visitor      │ │    Visitor      │ │   Visitor       │
+├─────────────────┤ ├─────────────────┤ ├─────────────────┤ ├─────────────────┤ ├─────────────────┤
+│-totalValue:int  │ │-totalWeight:int │ │-weaponCount:int │ │-totalPower:int  │ │(anonymous)      │
+├─────────────────┤ ├─────────────────┤ ├─potionCount:int │ ├─────────────────┤ ├─────────────────┤
+│+visit(Weapon)   │ │+visit(Weapon)   │ │-scrollCount:int │ │+visit(Weapon)   │ │+visit(Weapon)   │
+│+visit(Potion)   │ │+visit(Potion)   │ │-ringCount:int   │ │+visit(Potion)   │ │+visit(Potion)   │
+│+visit(Scroll)   │ │+visit(Scroll)   │ │-armorCount:int  │ │+visit(Scroll)   │ │+visit(Scroll)   │
+│+visit(Ring)     │ │+visit(Ring)     │ ├─────────────────┤ │+visit(Ring)     │ │+visit(Ring)     │
+│+visit(Armor)    │ │+visit(Armor)    │ │+visit(Weapon)   │ │+visit(Armor)    │ │+visit(Armor)    │
+│+getTotalValue() │ │+getTotalWeight()│ │+visit(Potion)   │ │+getTotalPower() │ │                 │
+└─────────────────┘ └─────────────────┘ │+visit(Scroll)   │ └─────────────────┘ └─────────────────┘
+                                         │+visit(Ring)     │
+                                         │+visit(Armor)    │
+                                         │+printSummary()  │
+                                         └─────────────────┘
+
+                                    ┌─────────────────────┐
+                                    │    <<abstract>>     │
+                                    │     Artifact        │
+                                    ├─────────────────────┤
+                                    │#name:String         │
+                                    │#value:int           │
+                                    │#weight:int          │
+                                    ├─────────────────────┤
+                                    │+getName():String    │
+                                    │+getValue():int      │
+                                    │+getWeight():int     │
+                                    │+accept(Visitor):void│ <<abstract>>
+                                    └──────────┬──────────┘
+                                               │
+            ┌──────────────┬───────────┬──────┴───────┬──────────────┐
+            │              │           │              │              │
+            ▼              ▼           ▼              ▼              ▼
+    ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+    │   Weapon    │ │   Potion    │ │   Scroll    │ │    Ring     │ │   Armor     │
+    ├─────────────┤ ├─────────────┤ ├─────────────┤ ├─────────────┤ ├─────────────┤
+    │-attackBonus │ │-healing:int │ │-spellEffect │ │-magicBonus  │ │-defenseBonus│
+    │    :int     │ │             │ │   :String   │ │    :int     │ │    :int     │
+    ├─────────────┤ ├─────────────┤ ├─────────────┤ ├─────────────┤ ├─────────────┤
+    │+getAttack   │ │+getHealing()│ │+getSpell    │ │+getMagic    │ │+getDefense  │
+    │  Bonus():int│ │   :int      │ │  Effect()   │ │  Bonus():int│ │  Bonus():int│
+    │+accept()    │ │+accept()    │ │   :String   │ │+accept()    │ │+accept()    │
+    └─────────────┘ └─────────────┘ │+accept()    │ └─────────────┘ └─────────────┘
+                                    └─────────────┘
+
+                         ┌─────────────────────┐
+                         │     Inventory       │
+                         ├─────────────────────┤
+                         │-artifacts:List<     │
+                         │   Artifact>         │
+                         ├─────────────────────┤
+                         │+addArtifact()       │
+                         │+getArtifacts():List │
+                         │+size():int          │
+                         │+accept(Visitor):void│
+                         │+copy():Inventory    │
+                         └─────────────────────┘
+
+
+
+
+
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                              MEMENTO PATTERN                                        │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────────────────────────────────────────────────────────────────────────┐
+    │                                                                                 │
+    │  ┌──────────────┐         ┌──────────────┐         ┌──────────────┐            │
+    │  │   Originator │         │   Memento    │         │  Caretaker   │            │
+    │  │    (Hero)    │────────▶│ (HeroMemento)│         │ (Caretaker)  │            │
+    │  └──────────────┘         └──────────────┘         └──────────────┘            │
+    │         │                        │                        │                    │
+    │         │ createMemento()        │                        │                    │
+    │         ├───────────────────────▶│                        │                    │
+    │         │                        │                        │                    │
+    │         │                        │    save(memento)       │                    │
+    │         │                        ├───────────────────────▶│                    │
+    │         │                        │                        │                    │
+    │         │ restoreFromMemento()   │                        │                    │
+    │         ◀────────────────────────┤                        │                    │
+    │         │                        │                        │                    │
+    │         │                        │    undo() ─────────────│                    │
+    │         │                        │◀───────────────────────┤                    │
+    │         │                        │                        │                    │
+    └─────────────────────────────────────────────────────────────────────────────────┘
+
+
+                         ┌─────────────────────────────────────┐
+                         │           Hero (Originator)         │
+                         ├─────────────────────────────────────┤
+                         │ -name:String      (final)           │
+                         │ -hp:int           (mutable)         │
+                         │ -mana:int         (mutable)         │
+                         │ -gold:int         (mutable)         │
+                         │ -maxHp:int        (final)           │
+                         │ -attackPower:int  (final)           │
+                         │ -defense:int      (final)           │
+                         │ -inventory:Inventory (mutable)      │
+                         ├─────────────────────────────────────┤
+                         │ +Hero(name, hp, attack, defense)     │
+                         │ +Hero(name, hp, mana, attack,        │
+                         │       defense, gold, inventory)      │
+                         │ +getName():String                    │
+                         │ +getHp():int                         │
+                         │ +getMana():int                       │
+                         │ +getGold():int                       │
+                         │ +getMaxHp():int                      │
+                         │ +getAttackPower():int                │
+                         │ +getDefense():int                    │
+                         │ +getInventory():Inventory            │
+                         │ +isAlive():boolean                   │
+                         │ +takeDamage(amount):void             │
+                         │ +heal(amount):void                   │
+                         │ +restoreMana(amount):void            │
+                         │ +spendMana(amount):boolean           │
+                         │ +addGold(amount):void                │
+                         │ +spendGold(amount):boolean           │
+                         │ +setInventory(inventory):void        │
+                         │ +createMemento():HeroMemento         │
+                         │ +restoreFromMemento(memento):void    │
+                         │ +toString():String                   │
+                         └─────────────────────────────────────┘
+                                              │
+                                              │ 
+                                              ▼
+                         ┌─────────────────────────────────────┐
+                         │       HeroMemento (Memento)         │
+                         │         (immutable)                 │
+                         ├─────────────────────────────────────┤
+                         │ -name:String                         │
+                         │ -hp:int                              │
+                         │ -mana:int                            │
+                         │ -gold:int                            │
+                         │ -maxHp:int                           │
+                         │ -attackPower:int                     │
+                         │ -defense:int                         │
+                         │ -inventorySnapshot:List<Artifact>    │
+                         ├─────────────────────────────────────┤
+                         │ HeroMemento(name, hp, mana, gold,    │
+                         │             maxHp, attack, defense,  │
+                         │             inventory)               │
+                         │ getName():String       (package)     │
+                         │ getHp():int            (package)     │
+                         │ getMana():int          (package)     │
+                         │ getGold():int          (package)     │
+                         │ getMaxHp():int         (package)     │
+                         │ getAttackPower():int   (package)     │
+                         │ getDefense():int       (package)     │
+                         │ getInventorySnapshot():List          │
+                         │                      (package)       │
+                         └─────────────────────────────────────┘
+                                              │
+                                              │ 
+                                              ▼
+                         ┌─────────────────────────────────────┐
+                         │       Caretaker (Caretaker)         │
+                         ├─────────────────────────────────────┤
+                         │ -history:Stack<HeroMemento>          │
+                         ├─────────────────────────────────────┤
+                         │ +save(memento):void                  │
+                         │ +undo():HeroMemento                  │
+                         │ +peek():HeroMemento                  │
+                         │ +size():int                          │
+                         └─────────────────────────────────────┘
+
+
+
+
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                         COMPLETE SYSTEM ARCHITECTURE                                │
+│                    Homework 9 - Chronomancer's Vault                               │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐     ┌─────────────────────────────────────────┐
+│            VISITOR PACKAGE              │     │           MEMENTO PACKAGE               │
+├─────────────────────────────────────────┤     ├─────────────────────────────────────────┤
+│                                         │     │                                         │
+│  ┌───────────────────────────┐          │     │  ┌───────────────────────────┐          │
+│  │ <<interface>>             │          │     │  │         Hero              │          │
+│  │ ArtifactVisitor           │          │     │  │      (Originator)         │          │
+│  └───────────┬───────────────┘          │     │  └───────────┬───────────────┘          │
+│              │                          │     │              │                          │
+│      ┌───────┼───────┬───────┬────────┐ │     │              │ creates                  │
+│      │       │       │       │        │ │     │              ▼                          │
+│      ▼       ▼       ▼       ▼        ▼ │     │  ┌───────────────────────────┐          │
+│  ┌───────┐┌───────┐┌───────┐┌───────┐┌───────┐│  │      HeroMemento          │          │
+│  │Value  ││Weight ││Detail││Enchant││Rarity ││  │       (Memento)            │          │
+│  │Calc   ││Calc   ││Report││Power  ││Visitor││  │    (immutable)             │          │
+│  └───────┘└───────┘└───────┘└───────┘└───────┘│  └───────────┬───────────────┘          │
+│                                         │     │              │                          │
+└─────────────────────────────────────────┘     │              │ stores (opaque)         │
+                                                 │              ▼                          │
+┌─────────────────────────────────────────┐     │  ┌───────────────────────────┐          │
+│           ARTIFACT PACKAGE              │     │  │       Caretaker           │          │
+├─────────────────────────────────────────┤     │  │       (Caretaker)         │          │
+│                                         │     │  │                           │          │
+│  ┌───────────────────────────┐          │     │  │  -history:Stack<Memento>  │          │
+│  │ <<abstract>>              │          │     │  │  +save()                  │          │
+│  │ Artifact                   │          │     │  │  +undo()                  │          │
+│  └───────────┬───────────────┘          │     │  │  +peek()                  │          │
+│              │                          │     │  │  +size()                  │          │
+│      ┌───────┼───────┬───────┬────────┐ │     │  └───────────────────────────┘          │
+│      │       │       │       │        │ │     │                                         │
+│      ▼       ▼       ▼       ▼        ▼ │     └─────────────────────────────────────────┘
+│  ┌───────┐┌───────┐┌───────┐┌───────┐┌───────┐
+│  │Weapon ││Potion ││Scroll ││ Ring  ││ Armor │
+│  └───────┘└───────┘└───────┘└───────┘└───────┘
+│                                         │
+│  ┌───────────────────────────┐          │
+│  │        Inventory          │          │
+│  │                           │          │
+│  │  -artifacts:List<Artifact>│          │
+│  │  +addArtifact()           │          │
+│  │  +accept(visitor)         │          │
+│  │  +copy()                  │          │
+│  └───────────────────────────┘          │
+│                                         │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐     ┌─────────────────────────────────────────┐
+│             VAULT PACKAGE               │     │              MAIN PACKAGE               │
+├─────────────────────────────────────────┤     ├─────────────────────────────────────────┤
+│                                         │     │                                         │
+│  ┌───────────────────────────┐          │     │  ┌───────────────────────────┐          │
+│  │   ChronomancerEngine      │          │     │  │          Main            │          │
+│  │                           │          │     │  │                           │          │
+│  │  +runVault(hero, inv)     │──────────┼────▶│  │  +main(args)              │          │
+│  │      :VaultRunResult      │          │     │  │                           │          │
+│  └───────────────────────────┘          │     │  └───────────────────────────┘          │
+│                                         │     │                                         │
+│  ┌───────────────────────────┐          │     │                                         │
+│  │    VaultRunResult         │          │     │                                         │
+│  │    (immutable)            │          │     │                                         │
+│  │                           │          │     │                                         │
+│  │  -artifactsAppraised:int  │          │     │                                         │
+│  │  -mementosCreated:int     │          │     │                                         │
+│  │  -restoredCount:int       │          │     │                                         │
+│  │  +getters...              │          │     │                                         │
+│  └───────────────────────────┘          │     │                                         │
+│                                         │     │                                         │
+└─────────────────────────────────────────┘     └─────────────────────────────────────────┘
+
